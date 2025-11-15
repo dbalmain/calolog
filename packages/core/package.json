@@ -1,0 +1,18 @@
+{
+  "name": "@calolog/core",
+  "version": "1.0.0",
+  "description": "Core business logic for calolog",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "echo \"Tests not yet implemented\""
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8"
+  }
+}
