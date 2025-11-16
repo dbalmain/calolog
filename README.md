@@ -31,6 +31,12 @@ npm run build
 npm run import-usda
 
 # Link the CLI globally (so you can use 'calolog' instead of 'node packages/cli/dist/index.js')
+# Note: If using Nix or similar read-only environments, first run:
+npm config set prefix ~/.npm-global
+mkdir -p ~/.npm-global
+# Then add to your shell config (e.g., ~/.bashrc, ~/.zshrc, ~/.config/fish/config.fish):
+# export PATH="$HOME/.npm-global/bin:$PATH"  # for bash/zsh
+# or: set -gx PATH $HOME/.npm-global/bin $PATH  # for fish
 cd packages/cli && npm link
 ```
 
