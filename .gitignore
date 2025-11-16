@@ -13,9 +13,13 @@ build/
 # Database and data files
 data/calolog.db
 data/calolog.db-journal
+data/calolog.db-shm
+data/calolog.db-wal
 data/usda/
 *.sqlite
 *.db
+*.db-shm
+*.db-wal
 
 # Environment variables
 .env
