@@ -25,7 +25,9 @@ npm install
 # Build all packages
 npm run build
 
-# Import USDA data (creates sample dataset)
+# Import USDA data (downloads ~100-200MB of real data)
+# This will download Foundation Foods and SR Legacy datasets
+# Falls back to sample dataset if download fails
 npm run import-usda
 ```
 
@@ -175,18 +177,26 @@ npm test
 
 ### USDA FoodData Central
 
-The sample dataset includes 8 common foods. For the full USDA database:
+Running `npm run import-usda` automatically downloads and imports:
+- **Foundation Foods**: ~600 foods with comprehensive nutrient data
+- **SR Legacy**: ~7,000+ foods from the legacy Standard Reference database
 
-1. Download datasets from: https://fdc.nal.usda.gov/download-datasets.html
-2. Place JSON files in `data/usda/`
-3. Update `packages/importer/src/parsers/USDAParser.ts` to parse them
-4. Run `npm run import-usda`
+The importer will:
+1. Download datasets from USDA (~100-200MB total)
+2. Extract and parse JSON files
+3. Import all foods and nutrients into SQLite
+4. Fall back to sample dataset (8 foods) if download fails
+
+Additional datasets can be added by:
+1. Manually downloading from: https://fdc.nal.usda.gov/download-datasets.html
+2. Placing JSON files in `data/usda/`
+3. Updating `packages/importer/src/parsers/USDAParser.ts` if needed
 
 Available datasets:
-- Foundation Foods
-- SR Legacy
-- Branded Foods
-- Survey (FNDDS)
+- Foundation Foods (auto-downloaded)
+- SR Legacy (auto-downloaded)
+- Branded Foods (70,000+ foods, manual download)
+- Survey/FNDDS (manual download)
 
 ## Architecture
 

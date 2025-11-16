@@ -5,7 +5,13 @@ import * as https from 'https';
 import extractZip from 'extract-zip';
 
 export class USDADownloader {
-  private readonly BASE_URL = 'https://fdc.nal.usda.gov/fdc-datasets';
+  // USDA dataset URLs (these are known stable URLs)
+  private readonly DATASET_URLS: Record<string, string> = {
+    foundation: 'https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_foundation_food_json_2022-10-28.zip',
+    sr_legacy: 'https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_json_2021-10-28.zip',
+    branded: 'https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_branded_food_json_2022-10-28.zip'
+  };
+
   private readonly dataDir: string;
 
   constructor(dataDir: string) {
@@ -16,7 +22,7 @@ export class USDADownloader {
   }
 
   /**
-   * Download a file from URL
+   * Download a file from URL with progress
    */
   private async downloadFile(url: string, filepath: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -24,10 +30,21 @@ export class USDADownloader {
 
       https.get(url, (response) => {
         if (response.statusCode === 302 || response.statusCode === 301) {
+          file.close();
+          fs.unlinkSync(filepath);
           // Follow redirect
           if (response.headers.location) {
             this.downloadFile(response.headers.location, filepath).then(resolve).catch(reject);
+          } else {
+            reject(new Error('Redirect without location header'));
           }
+          return;
+        }
+
+        if (response.statusCode !== 200) {
+          file.close();
+          fs.unlinkSync(filepath);
+          reject(new Error(`Failed to download: HTTP ${response.statusCode}`));
           return;
         }
 
@@ -51,23 +68,46 @@ export class USDADownloader {
 
   /**
    * Download and extract USDA dataset
-   * Note: This is a simplified version. In practice, you'd need to check the actual USDA download URLs
    */
   async downloadDataset(datasetType: 'foundation' | 'sr_legacy' | 'branded'): Promise<string> {
-    console.log(`Downloading ${datasetType} dataset...`);
+    const url = this.DATASET_URLS[datasetType];
+    if (!url) {
+      throw new Error(`Unknown dataset type: ${datasetType}`);
+    }
 
-    const filename = `FoodData_Central_${datasetType}_food_json.zip`;
+    const filename = `${datasetType}.zip`;
     const zipPath = path.join(this.dataDir, filename);
     const extractPath = path.join(this.dataDir, datasetType);
 
-    // In a real implementation, you would download from actual USDA URLs
-    // For now, we'll just create the directory structure
-    if (!fs.existsSync(extractPath)) {
-      fs.mkdirSync(extractPath, { recursive: true });
+    // Check if already extracted
+    if (fs.existsSync(extractPath)) {
+      const files = fs.readdirSync(extractPath);
+      if (files.length > 0) {
+        // Dataset already exists
+        return extractPath;
+      }
     }
 
-    console.log(`Dataset would be extracted to: ${extractPath}`);
-    console.log('NOTE: Please manually download USDA datasets from https://fdc.nal.usda.gov/download-datasets.html');
+    // Download the file
+    try {
+      await this.downloadFile(url, zipPath);
+    } catch (error: any) {
+      throw new Error(`Failed to download ${datasetType}: ${error.message}`);
+    }
+
+    // Extract the ZIP file
+    try {
+      if (!fs.existsSync(extractPath)) {
+        fs.mkdirSync(extractPath, { recursive: true });
+      }
+
+      await extractZip(zipPath, { dir: path.resolve(extractPath) });
+
+      // Clean up ZIP file
+      fs.unlinkSync(zipPath);
+    } catch (error: any) {
+      throw new Error(`Failed to extract ${datasetType}: ${error.message}`);
+    }
 
     return extractPath;
   }
