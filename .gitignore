@@ -40,3 +40,9 @@ logs/
 
 # OS
 Thumbs.db
+
+# Downlaods
+data/
+
+# Build
+packages/
