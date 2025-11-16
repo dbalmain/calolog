@@ -29,6 +29,9 @@ npm run build
 # This will download Foundation Foods and SR Legacy datasets
 # Falls back to sample dataset if download fails
 npm run import-usda
+
+# Link the CLI globally (so you can use 'calolog' instead of 'node packages/cli/dist/index.js')
+cd packages/cli && npm link
 ```
 
 ## Quick Start
@@ -38,7 +41,7 @@ npm run import-usda
 First, configure your profile to get personalized RDA-based goals:
 
 ```bash
-node packages/cli/dist/index.js goals set
+calolog goals set
 ```
 
 You'll be prompted for:
@@ -54,18 +57,18 @@ Log food with simple, natural input:
 
 ```bash
 # Basic food logging
-node packages/cli/dist/index.js log "200g chicken breast"
+calolog log "200g chicken breast"
 
 # With meal type
-node packages/cli/dist/index.js log "300g rice" --meal lunch
+calolog log "300g rice" --meal lunch
 
 # With notes
-node packages/cli/dist/index.js log "150g broccoli" --meal dinner --notes "steamed"
+calolog log "150g broccoli" --meal dinner --notes "steamed"
 
 # Different units
-node packages/cli/dist/index.js log "2 eggs"  # uses servings
-node packages/cli/dist/index.js log "1 cup milk"
-node packages/cli/dist/index.js log "8oz salmon"
+calolog log "2 eggs"  # uses servings
+calolog log "1 cup milk"
+calolog log "8oz salmon"
 ```
 
 Supported units: `g`, `kg`, `oz`, `lb`, `cup`, `tbsp`, `tsp`, `ml`, `l`, `serving`
@@ -75,10 +78,10 @@ Supported units: `g`, `kg`, `oz`, `lb`, `cup`, `tbsp`, `tsp`, `ml`, `l`, `servin
 See today's nutritional summary:
 
 ```bash
-node packages/cli/dist/index.js today
+calolog today
 
 # View specific date
-node packages/cli/dist/index.js today --date 2024-01-15
+calolog today --date 2024-01-15
 ```
 
 ### 4. Create Recipes
@@ -86,23 +89,23 @@ node packages/cli/dist/index.js today --date 2024-01-15
 Create custom recipes:
 
 ```bash
-node packages/cli/dist/index.js recipe create
+calolog recipe create
 
 # List all recipes
-node packages/cli/dist/index.js recipe list
+calolog recipe list
 
 # View recipe details
-node packages/cli/dist/index.js recipe show <id>
+calolog recipe show <id>
 ```
 
 ### 5. Manage Goals
 
 ```bash
 # View all goals
-node packages/cli/dist/index.js goals list
+calolog goals list
 
 # Update a specific goal
-node packages/cli/dist/index.js goals update "Protein" 150
+calolog goals update "Protein" 150
 ```
 
 ## How It Works
@@ -117,7 +120,7 @@ Calolog uses fuzzy matching to find foods:
 
 Example:
 ```bash
-node packages/cli/dist/index.js log "200g chiken"
+calolog log "200g chiken"
 # Shows: "Did you mean: Chicken, breast, meat only, raw?"
 ```
 
